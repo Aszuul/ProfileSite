@@ -203,7 +203,7 @@ input, select, textarea {
 				text-rendering: auto;
 				line-height: 1;
 				text-transform: none !important;
-				font-family: 'Font Awesome 5 Free';
+				font-family: 'Font Awesome 7 Free';
 				font-weight: 900;
 			}
 
@@ -2286,7 +2286,7 @@ input, select, textarea {
 				text-rendering: auto;
 				line-height: 1;
 				text-transform: none !important;
-				font-family: 'Font Awesome 5 Free';
+				font-family: 'Font Awesome 7 Free';
 				font-weight: 900;
 			}
 
@@ -2386,7 +2386,7 @@ input, select, textarea {
 			text-rendering: auto;
 			line-height: 1;
 			text-transform: none !important;
-			font-family: 'Font Awesome 5 Free';
+			font-family: 'Font Awesome 7 Free';
 			font-weight: 400;
 		}
 
@@ -2403,7 +2403,11 @@ input, select, textarea {
 		}
 
 		.icon.brands:before {
-			font-family: 'Font Awesome 5 Brands';
+			font-family: 'Font Awesome 7 Brands';
+		}
+
+		.icon.brands.fa-bluesky::before {
+			content: '\e671';
 		}
 
 /* Image */
@@ -2677,7 +2681,7 @@ input, select, textarea {
 				text-rendering: auto;
 				line-height: 1;
 				text-transform: none !important;
-				font-family: 'Font Awesome 5 Free';
+				font-family: 'Font Awesome 7 Free';
 				font-weight: 400;
 			}
 
@@ -3144,7 +3148,7 @@ input, select, textarea {
 						text-rendering: auto;
 						line-height: 1;
 						text-transform: none !important;
-						font-family: 'Font Awesome 5 Free';
+						font-family: 'Font Awesome 7 Free';
 						font-weight: 900;
 					}
 
