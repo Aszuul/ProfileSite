@@ -38,7 +38,7 @@ env:
   PROJECT_ID: 'project-3b259ac6-ccc7-49e1-961' # TODO: update to your Google Cloud project ID
   REGION: 'us-central1' # TODO: update to your region
   SERVICE: 'my-repo' # TODO: update to your service name
-  WORKLOAD_IDENTITY_PROVIDER: 'projects/685191948694/locations/global/workloadIdentityPools/github/providers/first-provider' # TODO: update to your workload identity provider
+  WORKLOAD_IDENTITY_PROVIDER: 'projects/project-3b259ac6-ccc7-49e1-961/locations/global/workloadIdentityPools/github/providers/first-provider' # TODO: update to your workload identity provider
   SERVICE_ACCOUNT: 'github-actions@project-3b259ac6-ccc7-49e1-961.iam.gserviceaccount.com'
 
 jobs:
