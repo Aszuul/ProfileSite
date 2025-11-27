@@ -1,0 +1,40 @@
+{% extends "layout.html" %}
+{% block title %}About{% endblock %}
+{% block content %}
+<!-- Wrapper -->
+<section id="wrapper">
+    <header>
+        <div class="inner">
+            <h2>Projects</h2>
+            <p>I am experienced designing and implementing CI/CD pipelines, Infrastructure as Code, and general automation.</p>
+        </div>
+    </header>
+
+    <!-- Content -->
+    <div class="wrapper">
+        <div class="inner">
+
+            <h3 class="major">Python</h3>
+            <p>Being drawn to data and the incredible stories it can tell I have used Python to help examine and explain issues, and organize data into easier to digest charts and graphs.</p>
+            
+            <h3 class="major">Terraform</h3>
+            <p>Standardization helps ensure that a task is repeatable and correct every time. Terraform allows us to define Infrastructure so it's always exactly the way you intend.</p> 
+            <p>I worked with existing Terraform projects to make them more modular and adaptable, allowing adjustments to the environment to be made by updating a json file instead of versioning the whole codebase.</p>
+            <p>I have also designed new Terraform scripts to standardize Datadog monitoring across products.</p>
+
+            <h3 class="major">Powershell</h3>
+            <p>Powershell is very useful for automating tasks in a Windows environment because of its mobility. One of the earliest projects of my career was replacing an inefficient and difficult to scale CI/CD pipeline.</p>
+            <p>Exploring Powershell 7 and the introduction of classes allowed me to deepen my knowledge of Object Oriented Programming, and improve my scripting gradually.</p>
+            <p>Through this I introduced logging, RESTful API calls, Config transformation, and automated SQL script generation and deployment.</p>
+            
+            <h3 class="major">Go</h3>
+            <p>Sometimes the best way to find things to automate is to do someone elses job for a time. I was intruduced to an infuriatingly manual process that Product Engineers were tasked with.</p>
+            <p>The process involved connecting to a database server and querying a specific value, editing that value, then inserting it back into the database.</p>
+            <p>Then they would manually recycle the application pools for the site and navigate to it to check that the formatting had not broken the page.</p>
+            <p>Using Go I wrote a web app to allow the PEs to view and edit the messages before commiting the change they needed. On commit it would even recycle the app pools for them.</p>
+            <p>The actual time spent on the task was reduced by about 90%, and it became far more difficult to break the website.</p>
+
+        </div>
+    </div>
+</section>
+{% endblock %}
