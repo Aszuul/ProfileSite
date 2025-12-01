@@ -9,7 +9,7 @@
         <noscript><link rel="stylesheet" href="{{ url_for('static', filename='assets/css/noscript.css') }}" /></noscript>
         <script src="https://kit.fontawesome.com/f2484c7f5a.js" crossorigin="anonymous"></script>
         <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='images/favicon.png') }}"/>
-
+		<script src="https://www.google.com/recaptcha/api.js"></script>
         {% endblock %}
     </head>
     <body class="is-preload">
@@ -45,7 +45,7 @@
 						<div class="inner">
 							<h2 class="major">Get in touch</h2>
 							<p>Please feel free to contact me about what you'd like to build.</p>
-							<form method="post" action="#">
+							<form id="contact_form" method="post" action="/sendmail">
 								<div class="fields">
 									<div class="field">
 										<label for="name">Name</label>
@@ -89,5 +89,10 @@
             <script src="{{ url_for('static', filename='assets/js/breakpoints.min.js') }}"></script>
             <script src="{{ url_for('static', filename='assets/js/util.js') }}"></script>
             <script src="{{ url_for('static', filename='assets/js/main.js') }}"></script>
+			<script>
+				function onSubmit(token) {
+				  document.getElementById("contact_form").submit();
+				}
+			</script>
     </body>
 </html>
