@@ -9,7 +9,7 @@
         <noscript><link rel="stylesheet" href="{{ url_for('static', filename='assets/css/noscript.css') }}" /></noscript>
         <script src="https://kit.fontawesome.com/f2484c7f5a.js" crossorigin="anonymous"></script>
         <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='images/favicon.png') }}"/>
-		<script src="https://www.google.com/recaptcha/api.js"></script>
+		<script src="https://www.google.com/recaptcha/api.js?render={{ CAPTCHA_SITE_KEY }}"></script>
         {% endblock %}
     </head>
     <body class="is-preload">
@@ -60,9 +60,25 @@
 										<textarea name="message" id="message" rows="4"></textarea>
 									</div>
 								</div>
+								<input type="hidden" name="g-recaptcha-response" id="g-recaptcha-response">
 								<ul class="actions">
 									<li><input type="submit" value="Send Message" /></li>
 								</ul>
+								<!-- implement a flash for submission failure -->
+								 {# --- FLASH MESSAGE DISPLAY BLOCK --- #}
+									{% with messages = get_flashed_messages(with_categories=true) %}
+										{% if messages %}
+											<div class="message-container">
+											{% for category, message in messages %}
+												{# Use the category (success/danger) for basic styling #}
+												<div class="alert alert-{{ category }}">
+													{{ message }}
+												</div>
+											{% endfor %}
+											</div>
+										{% endif %}
+									{% endwith %}
+								{# --- END FLASH MESSAGE DISPLAY BLOCK --- #}
 							</form>
 							<ul class="contact">
 								<!-- <li class="icon solid fa-home">
@@ -90,9 +106,18 @@
             <script src="{{ url_for('static', filename='assets/js/util.js') }}"></script>
             <script src="{{ url_for('static', filename='assets/js/main.js') }}"></script>
 			<script>
-				function onSubmit(token) {
-				  document.getElementById("contact_form").submit();
-				}
+				document.getElementById('contact_form').addEventListener('submit', function(event) {
+					event.preventDefault(); // Stop the form from submitting immediately
+					// Execute reCAPTCHA to get the token
+					grecaptcha.ready(function() {
+						grecaptcha.execute('{{ CAPTCHA_SITE_KEY }}', {action: 'contact_submit'}).then(function(token) {
+							// Put the token into the hidden field
+							document.getElementById('g-recaptcha-response').value = token;
+							// Now, manually submit the form
+							document.getElementById('contact_form').submit();
+						});
+					});
+				});
 			</script>
     </body>
 </html>
