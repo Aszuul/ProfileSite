@@ -67,6 +67,11 @@ def about():
 def projects():
     return render_template('projects.html', CAPTCHA_SITE_KEY=CAPTCHA_SITE_KEY)
 
+@app.route('/fun')
+def fun():
+    return render_template('fun.html', CAPTCHA_SITE_KEY=CAPTCHA_SITE_KEY)
+
+
 @app.route('/sendmail', methods=['POST'])
 def sendmail():
     # validate recaptcha
