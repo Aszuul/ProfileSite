@@ -14,29 +14,26 @@
     <div class="wrapper">
         <div class="inner">
 
-            <h3 class="major">Python</h3>
+            <h3 class="major">Troubleshooting and Analysis with Python</h3>
             <p>
                 I utilized my expertise in operational troubleshooting to resolve a critical visibility gap where false-negative telemetry was obscuring genuine production anomalies. By performing a forensic data analysis using Python, Pandas, and Plotly, I identified specific testing clusters generating consistent 50–100% error rates that saturated system logs. I spearheaded the isolation and filtering of this misleading data, effectively collapsing the production error rate from 15% to less than 1%. This optimization eliminated excessive logging overhead caused by retry loops and restored the engineering team’s capacity to detect and remediate real-world failures with high precision.
             </p>
             
-            <h3 class="major">Terraform</h3>
+            <h3 class="major">Process Improvement withTerraform</h3>
             <p>
-                Standardization helps ensure that a task is repeatable and correct every time. Terraform allows us to define Infrastructure so it's always exactly the way you intend.
-                I worked with existing Terraform projects to make them more modular and adaptable, allowing adjustments to the environment to be made by updating a json file instead of versioning the whole codebase.
-                I have also designed new Terraform scripts to standardize Datadog monitoring across products.
+                I leveraged my expertise in Infrastructure as Code (IaC) and configuration management to overhaul a rigid Terraform architecture that was suffering from chronic state drift. By performing a deep-dive analysis of the existing codebase, I identified that hard-coded environment configurations and improper resource lifecycle handling were necessitating manual hotfixes and blocking automated deployments.
+                I spearheaded the transition to a modular, environment-agnostic framework, implementing a shared resource library and decoupling environment logic from the core codebase. By integrating dynamic variable injection via our deployment orchestration layer, I eliminated the need for version-pinned code changes for environment updates. This strategic refactor virtually eliminated manual state reconciliation, reduced configuration overhead, and restored a "push-button" deployment capability across all environments with 100% consistency.
             </p>
 
-            <h3 class="major">Powershell</h3>
+            <h3 class="major">CI/CD and Automation with Powershell</h3>
             <p>
                 I leveraged my ability to analyze complex interconnected workflows to re-architect our CI/CD pipelines, resolving critical bottlenecks caused by inconsistent builds and misconfigured environments. By developing dynamic PowerShell modules and implementing a configuration-driven standardization strategy, I unified deployments across all environments. This initiative delivered a 30% reduction in the development lifecycle by eliminating recurring bugs and increasing QA testing confidence. Additionally, I achieved a 70% reduction in environment setup time through the automation of application installations, significantly accelerating team velocity. 
             </p>
             
-            <h3 class="major">Go</h3>
+            <h3 class="major">Developer Tools with Go</h3>
             <p>
-                Reduced task effort by 90% and reduced human error. Sometimes the best way to find things to automate is to do someone else's job for a time. I was introduced to a manual process that Product Engineers were tasked with.
-                The process involved connecting to a database server and querying a specific value, editing that value, then inserting it back into the database.
-                Then manually recycle the application pools for the site and navigate to it to check that the formatting had not broken the page.
-                Using Go I wrote a web app to allow the PEs to view and edit the messages before committing the change they needed. On commit it would even recycle the app pools for them.
+                I identified a significant operational bottleneck and risk vector by shadowing the Product Engineering team. I discovered a high-friction manual process requiring engineers to perform direct database queries, manual string manipulation, and sequential application pool recycles. This manual workflow was not only time-intensive but carried a high risk of production data corruption and layout breakage.
+                To remediate this, I developed a custom internal management platform using Go, which abstracted the database layer and provided a safe, validated interface for content updates. The application automated the end-to-end workflow—including input validation, data persistence, and automated service recycling—effectively reducing task effort by 90%. By replacing manual SQL interventions with a governed UI, I eliminated human error in the update cycle and enabled the engineering team to redirect their capacity toward high-value projects.
             </p>
 
         </div>
