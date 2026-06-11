@@ -12,9 +12,32 @@
    <!-- Content -->
     <div class="wrapper">
         <div class="inner">
+            <!-- Breakout (WASM) -->
+            <section id="game">
+                <h3>Breakout (WASM)</h3>
+                <p>Uses a Go-compiled WebAssembly module. If the game doesn't appear, make sure the WASM files are built and `wasm_exec.js` is present under `static/wasm/`.</p>
+                <div id="breakout-container" style="max-width:820px; margin:0 auto;">
+                    <canvas id="breakoutCanvas" width="800" height="600" style="width:100%; height:auto; border:1px solid #ccc; display:block; background:#f8f8f8;"></canvas>
+                </div>
+            </section>
             <!-- tic tac toe -->
-             
         </div>
     </div>
 </section>
+{% endblock %}
+
+{% block head %}
+{{ super() }}
+    <script src="{{ url_for('static', filename='wasm/wasm_exec.js') }}"></script>
+    <script src="{{ url_for('static', filename='wasm/bootstrap.js') }}"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const wasmUrl = "{{ url_for('static', filename='wasm/main.wasm') }}";
+            if (typeof loadGoWasm === 'function') {
+                loadGoWasm(wasmUrl).catch(console.error);
+            } else {
+                console.warn('WASM loader not found. Make sure static/wasm/bootstrap.js is present.');
+            }
+        });
+    </script>
 {% endblock %}

@@ -17,7 +17,7 @@ app.config['MAIL_USERNAME'] = 'scott.abernathy20@gmail.com'
 app.config['MAIL_PASSWORD'] = SMTP_KEY
 app.config['MAIL_DEFAULT_SENDER'] = 'noreply@scott-abernathy.com'
 mail = Mail(app)
-FLASK_DEBUG = os.environ.get('FLASK_ENV', True)
+FLASK_DEBUG = bool(os.environ.get('FLASK_ENV', None))
 
 def verify_recaptcha(token, action):
     """Verifies the reCAPTCHA token with Google."""
@@ -84,7 +84,7 @@ def sendmail():
     valid, res = verify_recaptcha(token, 'contact_submit')
     if not valid:
         flash('There was an issue with your submission.', 'danger')
-        return redirect(url_for())
+        return redirect(url_for('home'))
     name = request.form.get('name')
     email = request.form.get('email')
     message = request.form.get('message')
