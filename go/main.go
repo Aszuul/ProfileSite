@@ -4,11 +4,55 @@ import (
 	"syscall/js"
 )
 
+type Ball struct {
+	X  float64
+	Y  float64
+	DX float64
+	DY float64
+	R  float64
+}
+
+type Paddle struct {
+	X      float64
+	Width  float64
+	Height float64
+	Speed  float64
+}
+
+type Brick struct {
+	Active bool
+	X      float64
+	Y      float64
+	Width  float64
+	Height float64
+}
+
+type Game struct {
+	Canvas       js.Value
+	Ctx          js.Value
+	Width        float64
+	Height       float64
+	Ball         *Ball
+	Paddle       *Paddle
+	Bricks       [][]*Brick
+	Rows         int
+	Cols         int
+	LeftPressed  bool
+	RightPressed bool
+}
+
 func main() {
 	// Block forever after wiring up the game — keeps Go runtime alive in WASM
 	setupAndStart()
 	select {}
 }
+
+// TODO
+// create start game button and reset button
+// clearing blocks doesn't give a "win" screen.
+// ball should speed up after x number of bounces
+// brick layers should be different colors
+//
 
 func setupAndStart() {
 	doc := js.Global().Get("document")
@@ -17,50 +61,62 @@ func setupAndStart() {
 		// nothing to do if canvas not present
 		return
 	}
+
 	width := 800.0
 	height := 600.0
 	canvas.Set("width", width)
 	canvas.Set("height", height)
 	ctx := canvas.Call("getContext", "2d")
 
-	// game state
-	paddleWidth := 100.0
-	paddleHeight := 10.0
-	paddleX := (width - paddleWidth) / 2
+	game := &Game{
+		Canvas: canvas,
+		Ctx:    ctx,
+		Width:  width,
+		Height: height,
+		Ball:   &Ball{X: width / 2, Y: height / 2, DX: 2.5, DY: -2.5, R: 8.0},
+		Paddle: &Paddle{X: (width - 100.0) / 2, Width: 100.0, Height: 10.0, Speed: 6.0},
+		Rows:   5,
+		Cols:   8,
+	}
 
-	ballX := width / 2
-	ballY := height / 2
-	ballDX := 2.5
-	ballDY := -2.5
-	ballR := 8.0
+	game.initBricks()
+	game.setupKeyListeners()
+	game.startGameLoop()
+}
 
-	rows := 5
-	cols := 8
+func (g *Game) initBricks() {
 	brickW := 75.0
 	brickH := 20.0
 	brickP := 10.0
 	offsetTop := 30.0
 	offsetLeft := 30.0
 
-	bricks := make([][]int, rows)
-	for i := 0; i < rows; i++ {
-		bricks[i] = make([]int, cols)
-		for j := 0; j < cols; j++ {
-			bricks[i][j] = 1
+	g.Bricks = make([][]*Brick, g.Rows)
+	for i := 0; i < g.Rows; i++ {
+		g.Bricks[i] = make([]*Brick, g.Cols)
+		for j := 0; j < g.Cols; j++ {
+			bx := offsetLeft + float64(j)*(brickW+brickP)
+			by := offsetTop + float64(i)*(brickH+brickP)
+			g.Bricks[i][j] = &Brick{
+				Active: true,
+				X:      bx,
+				Y:      by,
+				Width:  brickW,
+				Height: brickH,
+			}
 		}
 	}
+}
 
-	left := false
-	right := false
-
+func (g *Game) setupKeyListeners() {
 	keyDown := js.FuncOf(func(this js.Value, args []js.Value) interface{} {
 		ev := args[0]
 		k := ev.Get("key").String()
 		if k == "ArrowLeft" || k == "Left" {
-			left = true
+			g.LeftPressed = true
 		}
 		if k == "ArrowRight" || k == "Right" {
-			right = true
+			g.RightPressed = true
 		}
 		return nil
 	})
@@ -68,105 +124,136 @@ func setupAndStart() {
 		ev := args[0]
 		k := ev.Get("key").String()
 		if k == "ArrowLeft" || k == "Left" {
-			left = false
+			g.LeftPressed = false
 		}
 		if k == "ArrowRight" || k == "Right" {
-			right = false
+			g.RightPressed = false
 		}
 		return nil
 	})
 	js.Global().Get("document").Call("addEventListener", "keydown", keyDown)
 	js.Global().Get("document").Call("addEventListener", "keyup", keyUp)
+}
 
+func (g *Game) startGameLoop() {
 	var raf js.Func
 	raf = js.FuncOf(func(this js.Value, args []js.Value) interface{} {
-		// update paddle
-		if left {
-			paddleX -= 6
-			if paddleX < 0 {
-				paddleX = 0
-			}
-		}
-		if right {
-			paddleX += 6
-			if paddleX+paddleWidth > width {
-				paddleX = width - paddleWidth
-			}
-		}
-
-		// update ball
-		ballX += ballDX
-		ballY += ballDY
-
-		if ballX+ballR > width || ballX-ballR < 0 {
-			ballDX = -ballDX
-		}
-		if ballY-ballR < 0 {
-			ballDY = -ballDY
-		} else if ballY+ballR > height {
-			// bottom
-			if ballX > paddleX && ballX < paddleX+paddleWidth {
-				ballDY = -ballDY
-				diff := ballX - (paddleX + paddleWidth/2)
-				ballDX = diff / (paddleWidth / 2) * 4
-			} else {
-				// reset
-				ballX = width / 2
-				ballY = height / 2
-				ballDX = 2.5
-				ballDY = -2.5
-			}
-		}
-
-		// brick collisions
-		for i := 0; i < rows; i++ {
-			for j := 0; j < cols; j++ {
-				if bricks[i][j] == 1 {
-					bx := offsetLeft + float64(j)*(brickW+brickP)
-					by := offsetTop + float64(i)*(brickH+brickP)
-					if ballX > bx && ballX < bx+brickW && ballY > by && ballY < by+brickH {
-						ballDY = -ballDY
-						bricks[i][j] = 0
-					}
-				}
-			}
-		}
-
-		// draw
-		ctx.Call("clearRect", 0, 0, width, height)
-
-		// ball
-		ctx.Call("beginPath")
-		ctx.Call("arc", ballX, ballY, ballR, 0, 2*3.14159)
-		ctx.Set("fillStyle", "#0095DD")
-		ctx.Call("fill")
-		ctx.Call("closePath")
-
-		// paddle
-		ctx.Call("beginPath")
-		ctx.Call("rect", paddleX, height-paddleHeight-10, paddleWidth, paddleHeight)
-		ctx.Set("fillStyle", "#0095DD")
-		ctx.Call("fill")
-		ctx.Call("closePath")
-
-		// bricks
-		for i := 0; i < rows; i++ {
-			for j := 0; j < cols; j++ {
-				if bricks[i][j] == 1 {
-					bx := offsetLeft + float64(j)*(brickW+brickP)
-					by := offsetTop + float64(i)*(brickH+brickP)
-					ctx.Call("beginPath")
-					ctx.Call("rect", bx, by, brickW, brickH)
-					ctx.Set("fillStyle", "#FF5733")
-					ctx.Call("fill")
-					ctx.Call("closePath")
-				}
-			}
-		}
-
+		g.update()
+		g.draw()
 		js.Global().Call("requestAnimationFrame", raf)
 		return nil
 	})
-
 	js.Global().Call("requestAnimationFrame", raf)
+}
+
+func (g *Game) update() {
+	g.Paddle.Update(g.LeftPressed, g.RightPressed, g.Width)
+	g.Ball.Update(g.Width, g.Height, g.Paddle, g.Bricks)
+}
+
+func (g *Game) draw() {
+	g.Ctx.Call("clearRect", 0, 0, g.Width, g.Height)
+	g.Ball.Draw(g.Ctx)
+	g.Paddle.Draw(g.Ctx, g.Height)
+	g.drawBricks()
+}
+
+func (g *Game) drawBricks() {
+	for i := 0; i < g.Rows; i++ {
+		for j := 0; j < g.Cols; j++ {
+			if g.Bricks[i][j].Active {
+				g.Bricks[i][j].Draw(g.Ctx)
+			}
+		}
+	}
+}
+
+// Ball methods
+func (b *Ball) Update(width, height float64, paddle *Paddle, bricks [][]*Brick) {
+	b.X += b.DX
+	b.Y += b.DY
+
+	// Wall collisions
+	if b.X+b.R > width || b.X-b.R < 0 {
+		b.DX = -b.DX
+	}
+	if b.Y-b.R < 0 {
+		b.DY = -b.DY
+	} else if b.Y+b.R > height {
+		// Paddle collision
+		if b.X > paddle.X && b.X < paddle.X+paddle.Width {
+			b.DY = -b.DY
+			diff := b.X - (paddle.X + paddle.Width/2)
+			b.DX = diff / (paddle.Width / 2) * 4
+		} else {
+			b.Reset(width, height)
+		}
+	}
+
+	// Brick collisions
+	for i := range len(bricks) {
+		// for i := 0; i < len(bricks); i++ {
+		for j := 0; j < len(bricks[i]); j++ {
+			brick := bricks[i][j]
+			if brick.Active && b.CollidesWith(brick) {
+				b.DY = -b.DY
+				brick.Active = false
+			}
+		}
+	}
+}
+
+func (b *Ball) CollidesWith(brick *Brick) bool {
+	return b.X > brick.X && b.X < brick.X+brick.Width &&
+		b.Y > brick.Y && b.Y < brick.Y+brick.Height
+}
+
+func (b *Ball) Reset(width, height float64) {
+	b.X = width / 2
+	b.Y = height / 2
+	b.DX = 2.5
+	b.DY = -2.5
+}
+
+func (b *Ball) Draw(ctx js.Value) {
+	ctx.Call("beginPath")
+	ctx.Call("arc", b.X, b.Y, b.R, 0, 2*3.14159)
+	ctx.Set("fillStyle", "#0095DD")
+	ctx.Call("fill")
+	ctx.Call("closePath")
+}
+
+// Paddle methods
+func (p *Paddle) Update(leftPressed, rightPressed bool, width float64) {
+	if leftPressed {
+		p.X -= p.Speed
+		if p.X < 0 {
+			p.X = 0
+		}
+	}
+	if rightPressed {
+		p.X += p.Speed
+		if p.X+p.Width > width {
+			p.X = width - p.Width
+		}
+	}
+}
+
+func (p *Paddle) Draw(ctx js.Value, height float64) {
+	ctx.Call("beginPath")
+	ctx.Call("rect", p.X, height-p.Height-10, p.Width, p.Height)
+	ctx.Set("fillStyle", "#0095DD")
+	ctx.Call("fill")
+	ctx.Call("closePath")
+}
+
+// Brick methods
+func (b *Brick) Draw(ctx js.Value) {
+	if b.Active {
+		ctx.Call("beginPath")
+		ctx.Call("rect", b.X, b.Y, b.Width, b.Height)
+		ctx.Set("fillStyle", "#FF5733")
+		ctx.Call("fill")
+		ctx.Call("closePath")
+	}
 }
