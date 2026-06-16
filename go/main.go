@@ -14,6 +14,7 @@ type Ball struct {
 
 type Paddle struct {
 	X      float64
+	Y      float64
 	Width  float64
 	Height float64
 	Speed  float64
@@ -74,7 +75,7 @@ func setupAndStart() {
 		Width:  width,
 		Height: height,
 		Ball:   &Ball{X: width / 2, Y: height / 2, DX: 2.5, DY: -2.5, R: 8.0},
-		Paddle: &Paddle{X: (width - 100.0) / 2, Width: 100.0, Height: 10.0, Speed: 6.0},
+		Paddle: &Paddle{X: (width - 100.0) / 2, Y: height - 10.0 - 10.0, Width: 100.0, Height: 10.0, Speed: 6.0},
 		Rows:   5,
 		Cols:   8,
 	}
@@ -179,9 +180,9 @@ func (b *Ball) Update(width, height float64, paddle *Paddle, bricks [][]*Brick) 
 	}
 	if b.Y-b.R < 0 {
 		b.DY = -b.DY
-	} else if b.Y+b.R > height {
+	} else if b.Y-b.R > paddle.Y {
 		// Paddle collision
-		if b.X > paddle.X && b.X < paddle.X+paddle.Width {
+		if (b.X+b.R) > paddle.X && (b.X+b.R) < paddle.X+paddle.Width {
 			b.DY = -b.DY
 			diff := b.X - (paddle.X + paddle.Width/2)
 			b.DX = diff / (paddle.Width / 2) * 4
@@ -192,8 +193,7 @@ func (b *Ball) Update(width, height float64, paddle *Paddle, bricks [][]*Brick) 
 
 	// Brick collisions
 	for i := range len(bricks) {
-		// for i := 0; i < len(bricks); i++ {
-		for j := 0; j < len(bricks[i]); j++ {
+		for j := range len(bricks[i]) {
 			brick := bricks[i][j]
 			if brick.Active && b.CollidesWith(brick) {
 				b.DY = -b.DY
@@ -203,9 +203,10 @@ func (b *Ball) Update(width, height float64, paddle *Paddle, bricks [][]*Brick) 
 	}
 }
 
+// TODO add side block collision
 func (b *Ball) CollidesWith(brick *Brick) bool {
-	return b.X > brick.X && b.X < brick.X+brick.Width &&
-		b.Y > brick.Y && b.Y < brick.Y+brick.Height
+	return (b.X-b.R) > brick.X && (b.X+b.R) < brick.X+brick.Width &&
+		(b.Y+b.R) > brick.Y && (b.Y-b.R) < brick.Y+brick.Height
 }
 
 func (b *Ball) Reset(width, height float64) {
@@ -241,7 +242,7 @@ func (p *Paddle) Update(leftPressed, rightPressed bool, width float64) {
 
 func (p *Paddle) Draw(ctx js.Value, height float64) {
 	ctx.Call("beginPath")
-	ctx.Call("rect", p.X, height-p.Height-10, p.Width, p.Height)
+	ctx.Call("rect", p.X, p.Y, p.Width, p.Height)
 	ctx.Set("fillStyle", "#0095DD")
 	ctx.Call("fill")
 	ctx.Call("closePath")

@@ -15,7 +15,7 @@ if %ERRORLEVEL% equ 0 (
         copy "%GOROOT%\lib\wasm\wasm_exec.js" "..\static\wasm\wasm_exec.js" >nul
         echo wasm_exec.js copied successfully.
     ) else (
-        echo Warning: wasm_exec.js not found at !GOROOT!\lib\wasm\
+        echo Warning: wasm_exec.js not found at %GOROOT%\lib\wasm\
     )
 ) else (
     echo.
