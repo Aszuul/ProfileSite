@@ -1,32 +1,10 @@
+//go:build js && wasm
+
 package main
 
 import (
 	"syscall/js"
 )
-
-type Ball struct {
-	X  float64
-	Y  float64
-	DX float64
-	DY float64
-	R  float64
-}
-
-type Paddle struct {
-	X      float64
-	Y      float64
-	Width  float64
-	Height float64
-	Speed  float64
-}
-
-type Brick struct {
-	Active bool
-	X      float64
-	Y      float64
-	Width  float64
-	Height float64
-}
 
 type Game struct {
 	Canvas       js.Value
@@ -169,75 +147,12 @@ func (g *Game) drawBricks() {
 	}
 }
 
-// Ball methods
-func (b *Ball) Update(width, height float64, paddle *Paddle, bricks [][]*Brick) {
-	b.X += b.DX
-	b.Y += b.DY
-
-	// Wall collisions
-	if b.X+b.R > width || b.X-b.R < 0 {
-		b.DX = -b.DX
-	}
-	if b.Y-b.R < 0 {
-		b.DY = -b.DY
-	} else if b.Y-b.R > paddle.Y {
-		// Paddle collision
-		if (b.X+b.R) > paddle.X && (b.X+b.R) < paddle.X+paddle.Width {
-			b.DY = -b.DY
-			diff := b.X - (paddle.X + paddle.Width/2)
-			b.DX = diff / (paddle.Width / 2) * 4
-		} else {
-			b.Reset(width, height)
-		}
-	}
-
-	// Brick collisions
-	for i := range len(bricks) {
-		for j := range len(bricks[i]) {
-			brick := bricks[i][j]
-			if brick.Active && b.CollidesWith(brick) {
-				b.DY = -b.DY
-				brick.Active = false
-			}
-		}
-	}
-}
-
-// TODO add side block collision
-func (b *Ball) CollidesWith(brick *Brick) bool {
-	return (b.X-b.R) > brick.X && (b.X+b.R) < brick.X+brick.Width &&
-		(b.Y+b.R) > brick.Y && (b.Y-b.R) < brick.Y+brick.Height
-}
-
-func (b *Ball) Reset(width, height float64) {
-	b.X = width / 2
-	b.Y = height / 2
-	b.DX = 2.5
-	b.DY = -2.5
-}
-
 func (b *Ball) Draw(ctx js.Value) {
 	ctx.Call("beginPath")
 	ctx.Call("arc", b.X, b.Y, b.R, 0, 2*3.14159)
 	ctx.Set("fillStyle", "#0095DD")
 	ctx.Call("fill")
 	ctx.Call("closePath")
-}
-
-// Paddle methods
-func (p *Paddle) Update(leftPressed, rightPressed bool, width float64) {
-	if leftPressed {
-		p.X -= p.Speed
-		if p.X < 0 {
-			p.X = 0
-		}
-	}
-	if rightPressed {
-		p.X += p.Speed
-		if p.X+p.Width > width {
-			p.X = width - p.Width
-		}
-	}
 }
 
 func (p *Paddle) Draw(ctx js.Value, height float64) {
@@ -248,7 +163,6 @@ func (p *Paddle) Draw(ctx js.Value, height float64) {
 	ctx.Call("closePath")
 }
 
-// Brick methods
 func (b *Brick) Draw(ctx js.Value) {
 	if b.Active {
 		ctx.Call("beginPath")
