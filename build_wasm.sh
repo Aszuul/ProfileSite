@@ -9,11 +9,11 @@ if [ $? -eq 0 ]; then
     echo ""
     echo "Copying wasm_exec.js..."
     GOROOT=$(go env GOROOT)
-    if [ -f "$GOROOT/misc/wasm/wasm_exec.js" ]; then
-        cp "$GOROOT/misc/wasm/wasm_exec.js" "../static/wasm/wasm_exec.js"
+    if [ -f "$GOROOT/lib/wasm/wasm_exec.js" ]; then
+        cp "$GOROOT/lib/wasm/wasm_exec.js" "../static/wasm/wasm_exec.js"
         echo "wasm_exec.js copied successfully."
     else
-        echo "Warning: wasm_exec.js not found at $GOROOT/misc/wasm/"
+        echo "Warning: wasm_exec.js not found at $GOROOT/lib/wasm/"
     fi
 else
     echo ""
