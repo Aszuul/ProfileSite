@@ -1,0 +1,51 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Build Go WASM (Breakout)",
+            "type": "shell",
+            "command": "${workspaceFolder}/build_wasm.bat",
+            "windows": {
+                "command": "${workspaceFolder}/build_wasm.bat"
+            },
+            "linux": {
+                "command": "bash",
+                "args": ["${workspaceFolder}/build_wasm.sh"]
+            },
+            "osx": {
+                "command": "bash",
+                "args": ["${workspaceFolder}/build_wasm.sh"]
+            },
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "problemMatcher": [],
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared"
+            }
+        },
+        {
+            "label": "Run Go Tests",
+            "type": "shell",
+            "command": "cd ${workspaceFolder}/go && go test ./...",
+            "windows": {
+                "command": "cd /d ${workspaceFolder}\\go && go test ./..."
+            },
+            "group": {
+                "kind": "test",
+                "isDefault": true
+            },
+            "problemMatcher": [],
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared"
+            }
+        }
+    ]
+}
