@@ -10,5 +10,5 @@ COPY requirements.txt .
 RUN pip install -r requirements.txt
 COPY . .
 COPY --from=wasm-builder /src/static/wasm/ /app/static/wasm/
-EXPOSE 8080
+EXPOSE 80
 CMD ["python", "app.py"]
